@@ -1,0 +1,850 @@
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="zh-CN"><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>人口调查员 · 人口普查小卫士</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+  <style>
+    /* 完全保留原页面所有样式（一字未改） */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: linear-gradient(145deg, #fae9d9 0%, #f5dcc8 50%, #f2d2bc 100%); 
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; 
+      padding: 1rem; 
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      cursor: pointer; /* 提示可点击 */
+    }
+    .game-container { 
+      max-width: 1200px; 
+      width: 100%; 
+      background: rgba(255, 255, 255, 0.9); 
+      backdrop-filter: blur(4px); 
+      border-radius: 2rem; 
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2); 
+      padding: 1.5rem; 
+      position: relative; 
+    }
+    .game-nav { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: center; 
+      gap: 0.75rem; 
+      margin-bottom: 1.5rem; 
+      padding-bottom: 1rem; 
+      border-bottom: 1px solid #ffbe7d; 
+    }
+    .nav-btn { 
+      background: rgba(255, 159, 69, 0.15); 
+      border: none; 
+      padding: 0.4rem 1rem; 
+      border-radius: 40px; 
+      font-size: 0.85rem; 
+      font-weight: 500; 
+      color: #5D4037; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      text-decoration: none; 
+      display: inline-block; 
+    }
+    .nav-btn:hover { 
+      background: #FF9F45; 
+      color: white; 
+      transform: translateY(-2px); 
+    }
+    .nav-btn.home-btn { 
+      background: rgba(197, 59, 31, 0.15); 
+    }
+    .nav-btn.home-btn:hover { 
+      background: #c53b1f; 
+    }
+    .game-header { 
+      text-align: center; 
+      margin-bottom: 1.5rem; 
+    }
+    .game-header h2 { 
+      font-family: '华文楷体', 'KaiTi', '楷体', system-ui; 
+      font-size: 1.8rem; 
+      color: #c53b1f; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      background: rgba(255, 215, 0, 0.1); 
+      padding: 0.5rem 1.2rem; 
+      border-radius: 60px; 
+    }
+    .stamp-progress { 
+      background: #f0e0d0; 
+      border-radius: 40px; 
+      padding: 0.5rem 1rem; 
+      margin-bottom: 1.5rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      flex-wrap: wrap; 
+      gap: 0.5rem; 
+    }
+    .stamps { 
+      display: flex; 
+      gap: 0.5rem; 
+      flex-wrap: wrap; 
+    }
+    .stamp { 
+      background: #e0c8b0; 
+      border-radius: 30px; 
+      padding: 0.2rem 0.8rem; 
+      font-size: 0.75rem; 
+      font-weight: bold; 
+      color: #9b6a42; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.3rem; 
+    }
+    .stamp.active { 
+      background: #FF9F45; 
+      color: white; 
+      box-shadow: 0 2px 8px rgba(255, 159, 69, 0.4); 
+    }
+    .reset-btn { 
+      background: none; 
+      border: 1px solid #FF9F45; 
+      color: #FF9F45; 
+      padding: 0.3rem 1rem; 
+      border-radius: 30px; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      font-size: 0.8rem; 
+    }
+    .reset-btn:hover { 
+      background: #FF9F45; 
+      color: white; 
+    }
+    .provinces-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+      gap: 1.5rem; 
+      margin-bottom: 1.5rem; 
+    }
+    .province-card { 
+      background: white; 
+      border-radius: 1.2rem; 
+      overflow: hidden; 
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+      transition: transform 0.2s, box-shadow 0.2s; 
+      scroll-margin-top: 100px; 
+    }
+    .province-card.completed { 
+      opacity: 0.9; 
+      background: #faf3ea; 
+    }
+    .province-card:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1); 
+    }
+    .province-header { 
+      background: #FFBE7D; 
+      padding: 0.8rem 1rem; 
+      color: #5D4037; 
+      font-weight: bold; 
+      font-size: 1.2rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .citizen-talk { 
+      background: #fef5e8; 
+      margin: 1rem; 
+      padding: 0.8rem; 
+      border-radius: 1rem; 
+      border-left: 4px solid #FF9F45; 
+      font-style: italic; 
+      color: #5D4037; 
+      font-size: 0.9rem; 
+    }
+    .options-area { 
+      padding: 0 1rem 1rem 1rem; 
+    }
+    .options { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.5rem; 
+      margin-bottom: 0.8rem; 
+    }
+    .option-btn { 
+      background: #f0e4d8; 
+      border: none; 
+      border-radius: 40px; 
+      padding: 0.6rem 0.8rem; 
+      text-align: left; 
+      font-size: 0.85rem; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      color: #5D4037; 
+    }
+    .option-btn:hover:not(:disabled) { 
+      background: #FFBE7D; 
+      transform: translateX(5px); 
+    }
+    .option-btn.correct { 
+      background: #4CAF50; 
+      color: white; 
+      animation: correctPulse 0.5s; 
+    }
+    .option-btn:disabled { 
+      cursor: default; 
+      opacity: 0.7; 
+    }
+    .feedback { 
+      font-size: 0.75rem; 
+      padding: 0.2rem 0; 
+      color: #c53b1f; 
+    }
+    .badge-overlay { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: rgba(0, 0, 0, 0.5); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 1000; 
+      opacity: 0; 
+      visibility: hidden; 
+      transition: all 0.3s; 
+    }
+    .badge-overlay.show { 
+      opacity: 1; 
+      visibility: visible; 
+    }
+    .badge { 
+      width: 260px; 
+      background: radial-gradient(circle at 30% 30%, #FFD966, #FF9F45); 
+      border-radius: 30px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      text-align: center; 
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3); 
+      animation: pop 0.5s cubic-bezier(0.34, 1.2, 0.64, 1); 
+      font-family: '华文楷体', 'KaiTi', system-ui; 
+      padding: 1.5rem; 
+    }
+    .badge i { 
+      font-size: 3rem; 
+      color: white; 
+      text-shadow: 2px 2px 0 #c53b1f; 
+      margin-bottom: 10px; 
+    }
+    .badge h3 { 
+      font-size: 1.6rem; 
+      color: white; 
+      font-weight: bold; 
+      margin-bottom: 5px; 
+      text-shadow: 1px 1px 0 #c53b1f; 
+    }
+    .badge button { 
+      background: white; 
+      border: none; 
+      padding: 6px 18px; 
+      border-radius: 30px; 
+      font-size: 0.8rem; 
+      cursor: pointer; 
+      color: #FF9F45; 
+      font-weight: bold; 
+      margin-top: 10px; 
+    }
+    @keyframes pop { 
+      0% { transform: scale(0.2) rotate(-10deg); opacity: 0; } 
+      70% { transform: scale(1.05) rotate(2deg); } 
+      100% { transform: scale(1) rotate(0deg); } 
+    }
+    @keyframes correctPulse { 
+      0% { transform: scale(1); } 
+      50% { transform: scale(1.05); } 
+      100% { transform: scale(1); } 
+    }
+    .toast { 
+      position: fixed; 
+      bottom: 30px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      background: #FF9F45; 
+      color: white; 
+      padding: 12px 24px; 
+      border-radius: 40px; 
+      font-weight: bold; 
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2); 
+      z-index: 100; 
+      transition: opacity 0.3s; 
+      opacity: 0; 
+      pointer-events: none; 
+    }
+    .toast.show { 
+      opacity: 1; 
+    }
+    .butterfly-deco { 
+      position: absolute; 
+      font-size: 1.8rem; 
+      opacity: 0.3; 
+      pointer-events: none; 
+      animation: floatButterfly 5s infinite; 
+    }
+    @keyframes floatButterfly { 
+      0%, 100% { transform: translateY(0) rotate(0deg); } 
+      50% { transform: translateY(-6px) rotate(5deg); } 
+    }
+    @media (max-width: 700px) { 
+      .game-container { padding: 1rem; } 
+      .province-header { font-size: 1rem; } 
+      .badge { width: 90%; max-width: 280px; } 
+      .game-header h2 { font-size: 1.4rem; } 
+    }
+    html { 
+      scroll-behavior: smooth; 
+      scroll-padding-top: 80px; 
+    }
+    .fixed-controls-group { 
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 15px; 
+      z-index: 1000; 
+      align-items: center; 
+    }
+    .control-btn { 
+      width: 50px; 
+      height: 50px; 
+      background: rgba(255, 255, 255, 0.9); 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+      cursor: pointer; 
+      transition: all 0.3s ease; 
+      border: none; 
+      font-size: 1.5rem; 
+      color: #5D4037; 
+    }
+    .control-btn:hover { 
+      transform: translateY(-3px); 
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); 
+      background: white; 
+    }
+    .control-btn.home-btn { 
+      color: #c53b1f; 
+    }
+    .control-btn.music-btn { 
+      color: #FF9F45; 
+    }
+    .control-btn.top-btn { 
+      color: #4CAF50; 
+    }
+    .control-btn:hover i { 
+      animation: pulse 0.5s; 
+    }
+    @keyframes pulse { 
+      0%, 100% { transform: scale(1); } 
+      50% { transform: scale(1.2); } 
+    }
+    .btn-label { 
+      font-size: 0.7rem; 
+      margin-top: 4px; 
+      color: #5D4037; 
+      font-weight: 500; 
+      text-align: center; 
+      background: rgba(255, 255, 255, 0.8); 
+      padding: 2px 8px; 
+      border-radius: 10px; 
+      width: 100%; 
+    }
+    .nav-title { 
+      width: 100%; 
+      text-align: center; 
+      font-weight: bold; 
+      color: #5D4037; 
+      margin-bottom: 0.5rem; 
+      font-size: 0.9rem; 
+    }
+    body,td,th { 
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; 
+    }
+    a:link, a:visited, a:hover, a:active { 
+      text-decoration: none; 
+    }
+    .fixed-controls-group .control-btn-container .btn-label a { 
+      color: #5d4037; 
+    }
+    
+    /* 音乐提示（按用户要求） */
+    #musicHint {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 1rem;
+      z-index: 9999;
+      display: block; /* 默认显示 */
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <!-- 音乐提示（按用户要求） -->
+  <div id="musicHint">点击页面任意位置启动背景音乐</div>
+
+  <div class="game-container relative">
+    <span class="butterfly-deco" style="top: 10px; left: 10px;">🦋</span>
+    <span class="butterfly-deco" style="bottom: 10px; right: 10px; animation-duration: 6s;">🦋</span>
+
+    <div class="game-nav" id="gameNav">
+      <div class="nav-title">快速导航</div>
+    </div>
+
+    <div class="game-header">
+      <h2><i class="fa fa-id-card"></i> 人口调查员 <i class="fa fa-child"></i></h2>
+      <p>🗺️ 根据居民的线索，选择正确的人口数据，集齐所有印章！</p>
+      <p style="font-size:0.75rem; color:#c53b1f;">⚠️ 注意：答错可以重选，已答对的省份不会重置哦！</p>
+    </div>
+
+    <div class="stamp-progress">
+      <div class="stamps" id="stampsContainer"></div>
+      <button class="reset-btn" id="resetGameBtn"><i class="fa fa-repeat"></i> 重置全部</button>
+    </div>
+
+    <div class="provinces-grid" id="provincesGrid"></div>
+  </div>
+
+  <!-- 固定控制按钮组（修改后：点击房子按钮用锚点跳转到主页面） -->
+  <div class="fixed-controls-group">
+    <div class="control-btn-container">
+      <!-- 主页按钮（含房子图标，点击后跳转到主页面） -->
+      <button class="control-btn home-btn" id="homeButton" title="返回主页" onclick="goToHomePage()">
+        <i class="fa fa-home"></i>
+      </button>
+      <!-- 按钮标签（用锚点链接跳转到主页面，去掉target="_blank"） -->
+      <div class="btn-label">
+        <a href="index.html">主页</a>
+      </div>
+    </div>
+    
+    <!-- 其他按钮（音乐、返回顶部，保持不变） -->
+    <div class="control-btn-container">
+      <button class="control-btn music-btn" id="musicToggle" title="音乐控制">
+        <i class="fa fa-music"></i>
+      </button>
+      <div class="btn-label">音乐</div>
+    </div>
+    <div class="control-btn-container">
+      <button class="control-btn top-btn" id="backToTopBtn" title="返回顶部">
+        <i class="fa fa-arrow-up"></i>
+      </button>
+      <div class="btn-label">顶部</div>
+    </div>
+  </div>
+
+  <!-- 背景音乐（完全保留原路径） -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="让世界充满爱.MP3" type="audio/mp3">
+  </audio>
+
+  <div id="toastMessage" class="toast"></div>
+  <div id="badgeOverlay" class="badge-overlay">
+    <div class="badge">
+      <i class="fa fa-shield"></i>
+      <h3>人口普查<br>小卫士</h3>
+      <p>🎉 恭喜你完成所有调查！ 🎉</p>
+      <button id="goToReportBtn">📊 关闭徽章</button>
+    </div>
+  </div>
+
+<script>
+    // ----- 【核心修改】2025年最新省份数据（互动式答题用） -----
+    const provincesData = [
+      { 
+        name: "新疆维吾尔自治区", 
+        clue: "“我们这儿少数民族多，生育观念传统，去年出生率在全国排前三！”", 
+        correctKey: "birthRate", 
+        correctValue: "10.5‰", 
+        options: [
+          { text: "出生率 10.5‰", key: "birthRate", value: "10.5‰" }, 
+          { text: "死亡率 5.2‰", key: "deathRate", value: "5.2‰" }, 
+          { text: "自然增长率 5.3‰", key: "naturalGrowth", value: "5.3‰" }
+        ], 
+        stampText: "🌿 新疆 · 西域新生", 
+        fact: "新疆2025年出生率10.5‰，受益于少数民族生育政策与传统文化，自然增长率5.3‰居西北前列。" 
+      },
+      { 
+        name: "上海市", 
+        clue: "“阿拉上海宁压力大，年轻人不想生，去年出生率刚过4‰……”", 
+        correctKey: "birthRate", 
+        correctValue: "4.0‰", 
+        options: [
+          { text: "出生率 4.0‰", key: "birthRate", value: "4.0‰" }, 
+          { text: "死亡率 5.5‰", key: "deathRate", value: "5.5‰" }, 
+          { text: "自然增长率 -1.5‰", key: "naturalGrowth", value: "-1.5‰" }
+        ], 
+        stampText: "🌃 上海 · 都市低生育", 
+        fact: "上海2025年出生率4.0‰，自然增长率-1.5‰，经济发达但生育成本高导致低生育率。" 
+      },
+      { 
+        name: "浙江省", 
+        clue: "“我们民营经济活跃，外来人口多，去年自然增长率还不错！”", 
+        correctKey: "naturalGrowth", 
+        correctValue: "2.7‰", 
+        options: [
+          { text: "出生率 7.8‰", key: "birthRate", value: "7.8‰" }, 
+          { text: "死亡率 5.1‰", key: "deathRate", value: "5.1‰" }, 
+          { text: "自然增长率 2.7‰", key: "naturalGrowth", value: "2.7‰" }
+        ], 
+        stampText: "💼 浙江 · 活力人口", 
+        fact: "浙江2025年自然增长率2.7‰，外来年轻人口流入抵消了本地低生育率。" 
+      },
+      { 
+        name: "四川省", 
+        clue: "“我们人口多，去年出生率8‰多，但死亡率也不低……”", 
+        correctKey: "birthRate", 
+        correctValue: "8.2‰", 
+        options: [
+          { text: "出生率 8.2‰", key: "birthRate", value: "8.2‰" }, 
+          { text: "死亡率 7.0‰", key: "deathRate", value: "7.0‰" }, 
+          { text: "自然增长率 1.2‰", key: "naturalGrowth", value: "1.2‰" }
+        ], 
+        stampText: "🌶️ 四川 · 人口大省", 
+        fact: "四川2025年出生率8.2‰，自然增长率1.2‰，西部人口基数大的典型代表。" 
+      },
+      { 
+        name: "河南省", 
+        clue: "“俺们中原人口多，去年自然增长率刚转负，有点担心……”", 
+        correctKey: "naturalGrowth", 
+        correctValue: "-0.7‰", 
+        options: [
+          { text: "出生率 6.5‰", key: "birthRate", value: "6.5‰" }, 
+          { text: "死亡率 7.2‰", key: "deathRate", value: "7.2‰" }, 
+          { text: "自然增长率 -0.7‰", key: "naturalGrowth", value: "-0.7‰" }
+        ], 
+        stampText: "🌾 河南 · 中原转折", 
+        fact: "河南2025年自然增长率-0.7‰，首次进入负增长，人口外流与生育意愿下降共同作用。" 
+      },
+      { 
+        name: "陕西省", 
+        clue: "“我们历史文化厚，去年出生率7‰，自然增长刚好转正！”", 
+        correctKey: "naturalGrowth", 
+        correctValue: "0.5‰", 
+        options: [
+          { text: "出生率 7.0‰", key: "birthRate", value: "7.0‰" }, 
+          { text: "死亡率 6.5‰", key: "deathRate", value: "6.5‰" }, 
+          { text: "自然增长率 0.5‰", key: "naturalGrowth", value: "0.5‰" }
+        ], 
+        stampText: "🏯 陕西 · 历史新生", 
+        fact: "陕西2025年自然增长率0.5‰，出生率7.0‰，历史文化底蕴支撑适度生育。" 
+      }
+    ];
+
+    // ----- 以下逻辑修改：确保点击房子按钮用锚点跳转到主页面 -----
+    let completed = new Array(provincesData.length).fill(false);
+    let feedbacks = new Array(provincesData.length).fill("");
+    let musicPlaying = false; // 音乐播放状态变量
+    let musicInitialized = false; // 音乐是否已初始化
+
+    // 跳转到主页面的函数（用链接锚点）
+    function goToHomePage() {
+      // 停止背景音乐（如果有）
+      const music = document.getElementById('bgMusic');
+      if (musicPlaying) {
+        music.pause();
+        musicPlaying = false;
+        document.getElementById('musicToggle').innerHTML = '<i class="fa fa-music"></i>';
+      }
+      // 显示提示
+      showToast("🏠 正在返回主页面...音乐已停止");
+      // 延迟跳转（让用户看到提示）
+      setTimeout(() => {
+        // 修复路径为正确的 all.html
+        window.location.href = "index.html";
+      }, 800);
+    }
+
+    // 显示提示消息的函数（保留原逻辑）
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toastMessage');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      toast.style.background = isError ? '#F44336' : '#FF9F45';
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.style.background = '#FF9F45';
+      }, 2000);
+    }
+
+    // 渲染导航栏（保留原逻辑）
+    function renderNav() {
+      const navContainer = document.getElementById('gameNav');
+      navContainer.innerHTML = '<div class="nav-title">快速导航</div>';
+      provincesData.forEach((prov, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.textContent = prov.name;
+        btn.onclick = () => {
+          const card = document.getElementById(`province-card-${idx}`);
+          if (card) {
+            const yOffset = -80;
+            const y = card.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }
+        };
+        navContainer.appendChild(btn);
+      });
+    }
+
+    // 渲染印章进度（保留原逻辑）
+    function renderStamps() {
+      const container = document.getElementById('stampsContainer');
+      container.innerHTML = '';
+      provincesData.forEach((prov, idx) => {
+        const stampDiv = document.createElement('div');
+        stampDiv.className = `stamp ${completed[idx] ? 'active' : ''}`;
+        stampDiv.innerHTML = `<i class="fa fa-stamp"></i> ${prov.stampText}`;
+        container.appendChild(stampDiv);
+      });
+    }
+
+    // 重置单个省份进度（保留原逻辑）
+    function resetProvince(provinceIndex) {
+      completed[provinceIndex] = false;
+      feedbacks[provinceIndex] = "";
+      renderStamps();
+      const cardElement = document.getElementById(`province-card-${provinceIndex}`);
+      if (cardElement) {
+        const newCard = createProvinceCard(provinceIndex);
+        cardElement.replaceWith(newCard);
+      }
+    }
+
+    // 重置所有进度（保留原逻辑）
+    function resetAll() {
+      completed.fill(false);
+      feedbacks.fill("");
+      renderStamps();
+      renderProvinces();
+      showToast("🔄 全部进度已重置，重新开始调查！");
+    }
+
+    // 滚动到顶部（保留原逻辑）
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast("⬆️ 已返回页面顶部");
+    }
+
+    // 创建省份卡片（保留原逻辑）
+    function createProvinceCard(idx) {
+      const prov = provincesData[idx];
+      const card = document.createElement('div');
+      card.className = `province-card ${completed[idx] ? 'completed' : ''}`;
+      card.id = `province-card-${idx}`;
+
+      const header = document.createElement('div');
+      header.className = 'province-header';
+      header.innerHTML = `<span>${prov.name}</span><span class="stamp-icon">${completed[idx] ? '🏅' : '📋'}</span>`;
+
+      const talkDiv = document.createElement('div');
+      talkDiv.className = 'citizen-talk';
+      talkDiv.innerHTML = `<i class="fa fa-commenting"></i> “${prov.clue}”`;
+
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'options-area';
+      const optionsContainer = document.createElement('div');
+      optionsContainer.className = 'options';
+
+      prov.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt.text;
+        btn.disabled = completed[idx];
+        if (completed[idx] && opt.value === prov.correctValue) btn.classList.add('correct');
+        btn.onclick = () => handleAnswer(idx, opt, btn, optionsContainer);
+        optionsContainer.appendChild(btn);
+      });
+
+      const feedbackSpan = document.createElement('div');
+      feedbackSpan.className = 'feedback';
+      feedbackSpan.id = `feedback-${idx}`;
+      feedbackSpan.innerHTML = feedbacks[idx] || '';
+
+      optionsDiv.appendChild(optionsContainer);
+      optionsDiv.appendChild(feedbackSpan);
+      card.appendChild(header);
+      card.appendChild(talkDiv);
+      card.appendChild(optionsDiv);
+      return card;
+    }
+
+    // 渲染省份卡片（保留原逻辑）
+    function renderProvinces() {
+      const grid = document.getElementById('provincesGrid');
+      grid.innerHTML = '';
+      for (let i = 0; i < provincesData.length; i++) {
+        grid.appendChild(createProvinceCard(i));
+      }
+    }
+
+    // 处理答案选择（保留原逻辑）
+    function handleAnswer(provinceIndex, selectedOption, btn, optionsContainer) {
+      if (completed[provinceIndex]) return;
+      const prov = provincesData[provinceIndex];
+      const isCorrect = (selectedOption.value === prov.correctValue);
+
+      if (isCorrect) {
+        const allBtns = optionsContainer.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+        btn.classList.add('correct');
+        feedbacks[provinceIndex] = `✅ 正确！${prov.fact}`;
+        completed[provinceIndex] = true;
+        renderStamps();
+
+        const feedbackDiv = document.getElementById(`feedback-${provinceIndex}`);
+        if (feedbackDiv) feedbackDiv.innerHTML = feedbacks[provinceIndex];
+
+        const cardDiv = btn.closest('.province-card');
+        if (cardDiv) cardDiv.classList.add('completed');
+        const headerStamp = cardDiv.querySelector('.province-header .stamp-icon');
+        if (headerStamp) headerStamp.innerHTML = '🏅';
+
+        showToast(`🎈 获得 ${prov.name} 普查印章！继续调查！`);
+
+        if (completed.every(v => v === true)) {
+          document.getElementById('badgeOverlay').classList.add('show');
+        }
+      } else {
+        resetProvince(provinceIndex);
+        showToast(`❌ 回答错误！请重新选择 ${prov.name} 的正确答案。`, true);
+      }
+    }
+
+    // 音乐控制逻辑（优化版）
+    const music = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicToggle');
+    const musicHint = document.getElementById('musicHint');
+    
+    function setMusicPlaying(playing) {
+      musicPlaying = playing;
+      if (playing) {
+        musicBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
+        musicBtn.setAttribute('title', '关闭音乐');
+        music.muted = false;
+        // 隐藏提示
+        if (musicHint) {
+          musicHint.style.opacity = '0';
+        }
+      } else {
+        musicBtn.innerHTML = '<i class="fa fa-music"></i>';
+        musicBtn.setAttribute('title', '播放音乐');
+        music.muted = true;
+      }
+    }
+    
+    function startMusic() {
+      if (musicInitialized) return;
+      
+      music.play()
+        .then(() => {
+          setMusicPlaying(true);
+          musicInitialized = true;
+          // 隐藏提示
+          if (musicHint) {
+            musicHint.style.display = 'none';
+          }
+        })
+        .catch(err => {
+          console.log("自动播放被阻止: ", err);
+          // 显示提示（保持显示）
+          if (musicHint) {
+            musicHint.style.display = 'block';
+          }
+        });
+    }
+    
+    // 点击页面任意位置启动音乐（核心修改）
+    document.body.addEventListener('click', function initMusic() {
+      // 立即隐藏提示
+      if (musicHint) {
+        musicHint.style.display = 'none';
+      }
+      
+      // 尝试播放音乐
+      if (!musicInitialized) {
+        startMusic();
+      }
+      
+      // 移除事件监听器，只执行一次
+      document.body.removeEventListener('click', initMusic);
+    });
+    
+    // 音乐按钮点击事件
+    musicBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (musicPlaying) {
+        music.pause();
+        setMusicPlaying(false);
+        // 显示提示
+        if (musicHint) {
+          musicHint.style.display = 'block';
+        }
+      } else {
+        music.play()
+          .then(() => {
+            setMusicPlaying(true);
+            musicInitialized = true;
+            // 隐藏提示
+            if (musicHint) {
+              musicHint.style.display = 'none';
+            }
+          })
+          .catch(err => {
+            console.log("播放失败: ", err);
+            showToast("音乐播放失败，请检查文件", true);
+          });
+      }
+    });
+    
+    window.addEventListener('beforeunload', () => {
+      if (musicPlaying) {
+        music.pause();
+        setMusicPlaying(false);
+      }
+    });
+
+    // 绑定其他按钮事件（保留原逻辑）
+    document.getElementById('backToTopBtn').addEventListener('click', scrollToTop);
+    document.getElementById('goToReportBtn').addEventListener('click', () => {
+      document.getElementById('badgeOverlay').classList.remove('show');
+    });
+    document.getElementById('resetGameBtn').addEventListener('click', resetAll);
+
+    // 初始化游戏（保留原逻辑）
+    function initGame() {
+      renderNav();
+      renderStamps();
+      renderProvinces();
+      // 尝试自动播放（失败后显示提示）
+      startMusic();
+    }
+
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', initGame);
+  </script>
+</body>
+</html>

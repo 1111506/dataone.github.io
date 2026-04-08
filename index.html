@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>东北躺平，西南开挂，行业大洗牌 | 2025中国人口普查数据可视化</title>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <style>
+    /* 完全保留原始样式，仅调整图表容器和总结布局 */
+    body {
+      background: linear-gradient(145deg, #fae9d9 0%, #f5dcc8 50%, #f2d2bc 100%);
+      color: #5D4037;
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      position: relative;
+      cursor: pointer; /* 提示用户可点击页面启动音乐 */
+    }
+    
+    .pomegranate {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(200, 80, 60, 0.1);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .butterfly {
+      font-size: 1.6rem;
+      display: inline-block;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      opacity: 0.5;
+    }
+    
+    .fancy-title {
+      font-family: '华文楷体', 'KaiTi', '楷体', serif;
+      font-weight: 800;
+      font-size: 3rem;
+      background: linear-gradient(135deg, #c53b1f, #e67e22, #f1c40f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: floatTitle 5s ease-in-out infinite;
+    }
+    
+    @keyframes floatTitle {
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-6px);}
+    }
+    
+    .hero-bg {
+      background: linear-gradient(145deg, rgba(255,242,229,0.85), rgba(255,232,214,0.95)), 
+                  url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23fae9d9"/%3E%3C/svg%3E');
+      background-size: cover;
+    }
+    
+    .card {
+      background-color: rgba(255,255,255,0.9);
+      backdrop-filter: blur(4px);
+      border-radius: 1rem;
+      transition: transform 0.2s;
+    }
+    
+    .card:hover { transform: translateY(-4px); }
+    
+    .stat-value { font-size: 2rem; font-weight: 700; }
+    
+    .chart-container { 
+      height: 220px; /* 基础高度，后续按需调整 */
+      width: 100%; 
+      max-width: 45%; /* 限制最大宽度，确保适配 */
+      margin: 0 auto; /* 图表居中 */
+    }
+    
+    /* 玫瑰图容器增大 */
+    #birthRateRoseChart + div + div .chart-container {
+      height: 260px;
+      max-width: 50%;
+    }
+    
+    /* 雷达图容器增大 */
+    #teacherSkillRadarChart + div + div .chart-container {
+      height: 240px;
+    }
+    
+    /* 教育/母婴/医疗图表容器增大（拉长放大） */
+    #educationTrendChart + div + div .chart-container,
+    #maternalIndustryChart + div + div .chart-container,
+    #medicalResourceChart + div + div .chart-container {
+      height: 320px; /* 增加高度到320px */
+      max-width: 100%; /* 最大宽度100% */
+    }
+    
+    .source-tag { 
+      font-size: 0.7rem; 
+      background: #f0e0d0; 
+      padding: 2px 6px; 
+      border-radius: 20px; 
+      margin: 2px; 
+      display: inline-block; 
+    }
+    
+    .scroll-reveal { 
+      opacity: 0; 
+      transform: translateY(15px); 
+      transition: opacity 0.5s, transform 0.5s; 
+    }
+    
+    .scroll-reveal.active { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+    
+    .province-data-card {
+      background: rgba(255,255,240,0.8);
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      transition: all 0.2s;
+    }
+    
+    .province-data-card:hover {
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    
+    .animate-float { animation: float 6s ease-in-out infinite; }
+    .animate-float-slow { animation: float 8s ease-in-out infinite; }
+    .animate-float-fast { animation: float 4s ease-in-out infinite; }
+    
+    .decor-icon {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .relative > *:not(.decor-icon) {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .fixed-controls-group {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+      align-items: center;
+    }
+    
+    .control-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 1.5rem;
+      color: #5D4037;
+    }
+    
+    .control-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      background: white;
+    }
+    
+    .control-btn.music-btn { color: #FF9F45; }
+    .control-btn.top-btn { color: #4CAF50; }
+    
+    .control-btn:hover i {
+      animation: pulse 0.5s;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    
+    .btn-label {
+      font-size: 0.7rem;
+      margin-top: 4px;
+      color: #5D4037;
+      font-weight: 500;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 2px 8px;
+      border-radius: 10px;
+      width: 100%;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #FF9F45;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-weight: bold;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      transition: opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .toast.show { opacity: 1; }
+    
+    /* 音乐提示样式 */
+    .music-hint {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 1rem;
+      z-index: 9999;
+      display: none;
+      animation: fadeInOut 3s ease-in-out;
+    }
+    
+    @keyframes fadeInOut {
+      0%,100% { opacity: 0; }
+      20%,80% { opacity: 1; }
+    }
+    
+    @media (max-width: 768px) {
+      .fancy-title { font-size: 2rem; }
+      .stat-value { font-size: 1.5rem; }
+      .chart-container { height: 180px; max-width: 100%; } /* 移动端图表占满宽度 */
+      #birthRateRoseChart + div + div .chart-container { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 音乐提示 -->
+  <div id="musicHint" class="music-hint">点击页面任意位置启动背景音乐</div>
+
+  <!-- 装饰元素 -->
+  <div class="pomegranate" style="width: 200px; height: 200px; top: 5%; left: -60px;"></div>
+  <div class="pomegranate" style="width: 150px; height: 150px; bottom: 10%; right: -40px;"></div>
+
+  <!-- 加载界面 -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center z-50 transition-opacity duration-300">
+    <div class="w-10 h-10 border-4 border-orange-300 border-t-orange-500 rounded-full animate-spin"></div>
+    <span class="ml-3 text-orange-700">加载中...</span>
+  </div>
+
+  <!-- 固定控制按钮组 -->
+  <div class="fixed-controls-group">
+    <div class="control-btn-container">
+      <button class="control-btn music-btn" id="musicToggle" title="音乐控制">
+        <i class="fa fa-music"></i>
+      </button>
+      <div class="btn-label">音乐</div>
+    </div>
+    
+    <div class="control-btn-container">
+      <button class="control-btn top-btn" id="backToTopBtn" title="返回顶部">
+        <i class="fa fa-arrow-up"></i>
+      </button>
+      <div class="btn-label">顶部</div>
+    </div>
+  </div>
+
+  <!-- 背景音乐（自动播放） -->
+  <audio id="bgMusic" preload="auto" loop>
+    <source src="明天会更好.MP3" type="audio/mp3">
+   您的浏览器不支持音频播放
+  </audio>
+
+  <!-- 提示消息 -->
+  <div id="toastMessage" class="toast"></div>
+
+  <!-- 导航栏 -->
+  <nav class="bg-white/80 backdrop-blur-sm py-3 shadow sticky top-0 z-40">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <div class="flex items-center">
+        <i class="fa fa-bar-chart text-orange-500 text-xl mr-2"></i>
+        <span class="font-bold text-stone-800">2025中国人口普查数据可视化</span>
+      </div>
+      <button id="menuBtn">
+        <i class="fa fa-bars text-xl"></i>
+      </button>
+    </div>
+    <div id="navMenu" class="hidden px-4 pb-2 space-y-1">
+      <a href="#overview" class="block py-1"><i class="fa fa-bar-chart mr-1"></i>数据核心篇</a>
+      <a href="#education" class="block py-1"><i class="fa fa-graduation-cap mr-1"></i>教育影响篇</a>
+      <a href="#maternal" class="block py-1"><i class="fa fa-smile-o mr-1"></i>母婴行业篇</a>
+      <a href="#medical" class="block py-1"><i class="fa fa-hospital-o mr-1"></i>医疗关联篇</a>
+      <a href="#summary" class="block py-1"><i class="fa fa-file-text-o mr-1"></i>总结展望</a>
+      <a href="#games" class="block py-1"><i class="fa fa-gamepad mr-1"></i>趣味互动游戏</a>
+    </div>
+  </nav>
+
+  <!-- 英雄区域 -->
+  <section class="hero-bg py-16 md:py-24 relative">
+    <span class="butterfly absolute top-12 left-8 animate-pulse">🦋</span>
+    <span class="butterfly absolute bottom-12 right-8 animate-pulse">🦋</span>
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="fancy-title">东北躺平，西南开挂，行业大洗牌</h1>
+      <p class="text-lg mt-4 mb-6">5.63‰出生率背后，31省份生老病死大洗牌，教育、母婴、医疗全链条重构</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button class="bg-orange-500 text-white px-5 py-2 rounded-full hover:bg-orange-600 transition" onclick="scrollToSection('overview')"><i class="fa fa-bar-chart mr-1"></i>核心数据解读</button>
+        <button class="border-2 border-orange-500 text-orange-500 px-5 py-2 rounded-full hover:bg-orange-500 hover:text-white transition" onclick="scrollToSection('education')"><i class="fa fa-graduation-cap mr-1"></i>教育影响分析</button>
+        <button class="border-2 border-orange-500 text-orange-500 px-5 py-2 rounded-full hover:bg-orange-500 hover:text-white transition" onclick="scrollToSection('maternal')"><i class="fa fa-smile-o mr-1"></i>母婴行业解读</button>
+        <button class="border-2 border-orange-500 text-orange-500 px-5 py-2 rounded-full hover:bg-orange-500 hover:text-white transition" onclick="scrollToSection('medical')"><i class="fa fa-hospital-o mr-1"></i>医疗关联分析</button>
+        <button class="border-2 border-orange-500 text-orange-500 px-5 py-2 rounded-full hover:bg-orange-500 hover:text-white transition" onclick="scrollToSection('summary')"><i class="fa fa-file-text-o mr-1"></i>总结展望</button>
+        <button class="border-2 border-orange-500 text-orange-500 px-5 py-2 rounded-full hover:bg-orange-500 hover:text-white transition" onclick="scrollToSection('games')"><i class="fa fa-gamepad mr-1"></i>趣味互动游戏</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主要内容区域 -->
+  <main class="container mx-auto px-4 py-8 relative z-10">
+    <!-- 数据核心篇（玫瑰图分析移至右侧，扩充字数） -->
+    <section id="overview" class="mb-12 scroll-reveal">
+      <div class="text-center mb-6">
+        <div class="flex justify-center gap-2">
+          <span class="butterfly">🦋</span>
+          <h2 class="text-2xl font-bold"><span class="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">数据核心篇：5.63‰出生率背后，31省份生老病死大洗牌</span></h2>
+          <span class="butterfly">🦋</span>
+        </div>
+        <p class="text-gray-600 mt-2">2025年全国人口140489万，连续4年负增长，区域分化加剧</p>
+        <div class="mt-2">
+          <span class="source-tag" onclick="window.open('https://www.gov.cn/lianbo/202602/content_7059980.htm', '_blank')">来源：国家统计局</span>
+          <span class="source-tag" onclick="window.open('https://population.gotohui.com/', '_blank')">来源：聚汇数据</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+        <div class="card p-5">
+          <div class="flex justify-between">
+            <div>
+              <h3 class="text-gray-500 text-sm">全国出生率（2025）</h3>
+              <p class="stat-value" data-target="5.63" data-unit="‰">0‰</p>
+            </div>
+            <div class="bg-orange-100 rounded-full p-2">
+              <i class="fa fa-child text-orange-500"></i>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm mt-2">
+            <span>最高：西藏 13.87‰</span>
+            <span>最低：黑龙江 3.35‰</span>
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex justify-between">
+            <div>
+              <h3 class="text-gray-500 text-sm">全国死亡率（2025）</h3>
+              <p class="stat-value" data-target="8.04" data-unit="‰">0‰</p>
+            </div>
+            <div class="bg-red-100 rounded-full p-2">
+              <i class="fa fa-heartbeat text-red-500"></i>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm mt-2">
+            <span>最高：黑龙江 9.69‰</span>
+            <span>最低：广东 5.20‰</span>
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex justify-between">
+            <div>
+              <h3 class="text-gray-500 text-sm">全国自然增长率（2025）</h3>
+              <p class="stat-value text-red-500" data-target="-2.41" data-unit="‰">0‰</p>
+            </div>
+            <div class="bg-purple-100 rounded-full p-2">
+              <i class="fa fa-line-chart text-purple-500"></i>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm mt-2">
+            <span>最高：西藏 8.43‰</span>
+            <span>最低：黑龙江 -6.34‰</span>
+          </div>
+        </div>
+      </div>
+      <div class="card p-5 mt-4">
+        <h3 class="text-lg font-medium mb-3">📊 2025年省份人口数据速览</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="province-data-card text-center">
+            <div class="font-bold">黑龙江</div>
+            <div class="text-xs">出生率 3.35‰</div>
+            <div class="text-xs text-red-500">自然增长 -6.34‰</div>
+          </div>
+          <div class="province-data-card text-center">
+            <div class="font-bold">西藏</div>
+            <div class="text-xs">出生率 13.87‰</div>
+            <div class="text-xs text-green-600">自然增长 8.43‰</div>
+          </div>
+          <div class="province-data-card text-center">
+            <div class="font-bold">广东</div>
+            <div class="text-xs">出生率 8.89‰</div>
+            <div class="text-xs text-green-600">自然增长 3.69‰</div>
+          </div>
+          <div class="province-data-card text-center">
+            <div class="font-bold">福建</div>
+            <div class="text-xs">出生率 6.15‰</div>
+            <div class="text-xs text-red-500">降幅 22.7%</div>
+          </div>
+          <div class="province-data-card text-center">
+            <div class="font-bold">贵州</div>
+            <div class="text-xs">出生率 10.74‰</div>
+            <div class="text-xs text-green-600">自然增长 3.00‰</div>
+          </div>
+          <div class="province-data-card text-center">
+            <div class="font-bold">江苏</div>
+            <div class="text-xs">出生率 4.98‰</div>
+            <div class="text-xs text-red-500">自然增长 -2.50‰</div>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-3 text-center">数据来源：<span class="source-tag" onclick="window.open('https://news.qq.com/rain/a/20260325A02FYC00', '_blank')">腾讯新闻</span></p>
+      </div>
+      <!-- 玫瑰图（分析移至右侧，右侧文字加大字号加边框，调整图例） -->
+      <div class="card p-5 mt-6">
+        <h3 class="text-lg font-medium mb-3">2025年各省份出生率分布（玫瑰图）</h3>
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+          <div class="chart-container">
+            <canvas id="birthRateRoseChart"></canvas>
+          </div>
+          <div class="text-base text-gray-700 font-medium border-2 border-orange-300 rounded-lg p-3 bg-orange-50" style="flex: 1; padding-top: 20px;">
+            <strong>数据解析：</strong>玫瑰图以多颜色示出生率极差：西南藏（13.87‰）因藏族文化保留及二孩全覆盖居首，贵（10.74‰）靠少数民族宽松政策较四年前升1.2点，云（8.32‰）紧随；东北黑（3.35‰）吉（4.17‰）辽（4.52‰）陷超低陷阱，青壮年外流致育龄妇女比低至58%、育儿成本占收入42%；沿海粤（8.89‰）赖流动人口红利胜江浙，苏（4.98‰）为高房价教育内卷所困。未来西南续高，东北或破3‰，区域落差将逾四倍。<br><br>
+            数据来源：<span class="source-tag" onclick="window.open('https://news.qq.com/rain/a/20260325A02FYC00', '_blank')">腾讯新闻</span>、<span class="source-tag" onclick="window.open('https://population.gotohui.com/', '_blank')">聚汇数据</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 教育影响篇（雷达图分析扩充字数） -->
+    <section id="education" class="mb-12 scroll-reveal relative">
+      <div class="decor-icon animate-float" style="top: 5%; left: 2%;"><i class="fa fa-book"></i></div>
+      <div class="decor-icon animate-float-slow" style="top: 15%; right: 3%;"><i class="fa fa-pencil"></i></div>
+      <div class="decor-icon animate-float-fast" style="bottom: 10%; left: 5%;"><i class="fa fa-graduation-cap"></i></div>
+      <div class="decor-icon animate-float" style="bottom: 20%; right: 8%;"><i class="fa fa-pencil-square-o"></i></div>
+      <div class="text-center mb-6">
+        <div class="flex justify-center gap-2">
+          <span class="butterfly">🦋</span>
+          <h2 class="text-2xl font-bold"><span class="bg-gradient-to-r from-blue-500 to-sky-400 bg-clip-text text-transparent">教育影响篇：小学教师减6.62万！乡村学校撤并潮来了</span></h2>
+          <span class="butterfly">🦋</span>
+        </div>
+        <p class="text-gray-600">2024年幼儿园减少5600所，小学教师减6.62万，资源向城市集中</p>
+        <div>
+          <span class="source-tag" onclick="window.open('https://news.qq.com/rain/a/20250710A08RQJ00', '_blank')">来源：腾讯新闻</span>
+          <span class="source-tag" onclick="window.open('https://edu.cnr.cn/sygdjy/20250611/t20250611_527205803.shtml', '_blank')">来源：央广网</span>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="card p-5">
+          <h3 class="text-lg font-medium mb-3">核心教育数据变化</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="text-sm text-gray-500">2024年全国小学专任教师变化</div>
+              <div class="flex items-baseline">
+                <p class="stat-value text-blue-600" data-target="-6.62" data-unit="万">0万</p>
+                <div class="ml-3 text-xs">
+                  <p>城区 +8.78万</p>
+                  <p>镇区 -3.6万</p>
+                  <p>乡村 -11.8万</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500">学前教育专任教师变化 (2022-2024)</div>
+              <p class="stat-value text-blue-600" data-target="-41.23" data-unit="万">0万</p>
+              <p class="text-xs">2022年324.42万 → 2024年283.19万</p>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500">小学/幼儿园减少数量（2024）</div>
+              <div class="flex gap-4">
+                <div>
+                  <p class="stat-value text-blue-600" data-target="7200" data-unit="所">0所</p>
+                  <p class="text-xs">小学减少</p>
+                </div>
+                <div>
+                  <p class="stat-value text-blue-600" data-target="5600" data-unit="所">0所</p>
+                  <p class="text-xs">幼儿园关停</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <h3 class="text-lg font-medium mb-3">2022-2024教育关键数据变化趋势</h3>
+          <!-- 数据解析移到图表上方 -->
+          <div class="text-xs text-gray-600 mt-2 mb-2">
+            <strong>数据解析：</strong>折线图显示学前教育教师数量逐年下降，幼儿园关停数量急剧上升，反映出生人口减少对教育资源的直接影响。数据来源：<span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo178-0/52604.html?acPlatCode=imw&acFrom=recomBar&iimediaId=106308', '_blank')">艾媒咨询</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="educationTrendChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <!-- 雷达图（分析扩充字数，右侧文字加大字号加边框，增大尺寸） -->
+      <div class="card p-5 mt-6">
+        <h3 class="text-lg font-medium mb-3">教师转岗能力需求雷达图</h3>
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+          <div class="chart-container">
+            <canvas id="teacherSkillRadarChart"></canvas>
+          </div>
+          <div class="text-base text-gray-700 font-medium border-2 border-blue-300 rounded-lg p-3 bg-blue-50" style="flex: 1; padding-top: 20px;">
+            <strong>数据解析：</strong>雷达图揭示转岗教师五维能力需求：跨学科教学85分居首，因78%教师须一师多科，厦门培训2300人考核通过率仅65%；心理辅导78分次之，乡村留守童占42%，教师仅32%受训致抑郁检出率偏高；在线教育工具72分，贵州教师借国家平台融蜡染入课获十万点击；课程设计68分，课后服务周均4.2课时，浙江安吉竹编课助校获全国示范；家校沟通75分，外出务工家长多，线上沟通使苏某县满意度自58%升至82%。教育部《乡村教师转岗能力提升计划》三年投23亿实现培训全覆盖，力补短板。<br><br>
+            数据来源：<span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo178-0/52604.html?acPlatCode=imw&acFrom=recomBar&iimediaId=106308', '_blank')">艾媒咨询</span>、<span class="source-tag" onclick="window.open('http://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202506/t20250611_1193760.html', '_blank')">2024年教育事业统计公报</span>
+          </div>
+        </div>
+      </div>
+      <div class="card p-5 mt-6">
+        <h3 class="text-lg font-medium">教师队伍调整与学校布局优化</h3>
+        <div class="grid md:grid-cols-2 gap-4 mt-2">
+          <div>
+            <p>多地启动教师转岗机制，优化资源配置：</p>
+            <ul class="list-disc list-inside text-sm mt-1">
+              <li>2024年全国小学专任教师总量减少6.62万人</li>
+              <li>厦门同安区：小学教师转岗至初高中</li>
+              <li>江西丰城市：农村小学教师转岗至农村中学</li>
+              <li>29个省份乡村小学教师数量下降</li>
+            </ul>
+          </div>
+          <div>
+            <blockquote class="bg-blue-50 p-3 rounded border-l-4 border-blue-500 italic">
+              "这是教师资源的优化配置，适应人口流动和学龄儿童结构变化的必然选择。"
+              <footer class="text-right text-xs mt-1">— 厦门大学丁长发副教授</footer>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 母婴行业篇（饼图分析扩充字数） -->
+    <section id="maternal" class="mb-12 scroll-reveal relative">
+      <div class="decor-icon animate-float" style="top: 8%; left: 3%;"><i class="fa fa-smile-o"></i></div>
+      <div class="decor-icon animate-float-slow" style="top: 20%; right: 5%;"><i class="fa fa-heart"></i></div>
+      <div class="decor-icon animate-float-fast" style="bottom: 12%; left: 7%;"><i class="fa fa-star"></i></div>
+      <div class="decor-icon animate-float" style="bottom: 25%; right: 10%;"><i class="fa fa-smile-o"></i></div>
+      <div class="text-center mb-6">
+        <div class="flex justify-center gap-2">
+          <span class="butterfly">🦋</span>
+          <h2 class="text-2xl font-bold"><span class="bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">母婴行业篇：30万母婴店剩15万？人口红利消失后的转型战</span></h2>
+          <span class="butterfly">🦋</span>
+        </div>
+        <p class="text-gray-600">2023年107.9万企业注销，营养品成新利润支柱</p>
+        <div>
+          <span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo30-0/46709.html?acPlatCode=imw&acFrom=recomBar&iimediaId=105523', '_blank')">来源：艾媒咨询</span>
+          <span class="source-tag" onclick="window.open('https://www.toutiao.com/article/7491146103703585316/', '_blank')">来源：今日头条</span>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="card p-5">
+          <h3 class="text-lg font-medium mb-3">母婴行业核心数据</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="text-sm text-gray-500">母婴门店数量变化</div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold">巅峰30万家</span>
+                <i class="fa fa-arrow-right"></i>
+                <span class="font-bold text-orange-600" data-target="15" data-unit="万家">0万家</span>
+                <span class="text-xs">(2024年)</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500">2023年母婴相关企业注销</div>
+              <p class="stat-value text-orange-600" data-target="107.9" data-unit="万家">0万家</p>
+              <p class="text-xs text-red-500">同比增长161.4%</p>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500">2024年5月母婴店企业变动</div>
+              <div class="flex gap-4">
+                <div>
+                  <p class="stat-value text-red-500" data-target="1337" data-unit="家">0家</p>
+                  <span class="text-xs">注销</span>
+                </div>
+                <div>
+                  <p class="stat-value text-green-600" data-target="798" data-unit="家">0家</p>
+                  <span class="text-xs">新注册</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500">品类调整趋势（2024）</div>
+              <ul class="text-sm list-disc list-inside">
+                <li>52%门店奶粉销售下滑</li>
+                <li>32.6%门店营养品销售增长</li>
+                <li>儿童粉、特配粉成增量主力</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <h3 class="text-lg font-medium mb-3">2020-2024母婴行业关键数据对比</h3>
+          <!-- 数据解析移到图表上方 -->
+          <div class="text-xs text-gray-600 mt-2 mb-2">
+            <strong>数据解析：</strong>柱状图对比母婴门店数量与企业注销数的反向关系，反映行业从增量扩张转向存量竞争的态势。数据来源：<span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo30-0/46709.html?acPlatCode=imw&acFrom=recomBar&iimediaId=105523', '_blank')">艾媒咨询</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="maternalIndustryChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <!-- 饼图（分析扩充字数，右侧文字加大字号加边框） -->
+      <div class="card p-5 mt-6">
+        <h3 class="text-lg font-medium mb-3">2024年母婴品类销售结构</h3>
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+          <div class="chart-container">
+            <canvas id="maternalCategoryPieChart"></canvas>
+          </div>
+          <div class="text-base text-gray-700 font-medium border-2 border-amber-300 rounded-lg p-3 bg-amber-50" style="flex: 1; padding-top: 20px;">
+            <strong>数据解析：</strong>饼图呈母婴店转型逻辑：奶粉占32%但利润率仅12%，国产价格战致进口份额降至32%，惠氏推中端应对；营养品占15%利润率达35%增长最快，汤臣倍健孕期维生素销8亿复购58%，合生元益生菌高端占比25%；纸尿裤占18%利润率18%，订阅制锁客致中小品牌年销千二家，大王凭设计溢价50%；服装占20%利润率25%，仿制周期仅7天，戴维贝拉IP联名秋冬款增40%；其他占15%利润率20%，智能母婴增速28%，小米生态链恒温壶年收5亿。孩子王闭店300家转型服务，服务收入占比升至22%，净利增15%。<br><br>
+            数据来源：<span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo30-0/46709.html?acPlatCode=imw&acFrom=recomBar&iimediaId=105523', '_blank')">艾媒咨询</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 医疗关联篇（散点图分析扩充字数） -->
+    <section id="medical" class="mb-12 scroll-reveal relative">
+      <div class="decor-icon animate-float" style="top: 5%; left: 2%;"><i class="fa fa-stethoscope"></i></div>
+      <div class="decor-icon animate-float-slow" style="top: 18%; right: 4%;"><i class="fa fa-ambulance"></i></div>
+      <div class="decor-icon animate-float-fast" style="bottom: 10%; left: 6%;"><i class="fa fa-plus-square"></i></div>
+      <div class="decor-icon animate-float" style="bottom: 22%; right: 12%;"><i class="fa fa-heartbeat"></i></div>
+      <div class="text-center mb-6">
+        <div class="flex justify-center gap-2">
+          <span class="butterfly">🦋</span>
+          <h2 class="text-2xl font-bold"><span class="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">医疗关联篇：人均预期79岁！卫生资源布局跟着人口走</span></h2>
+          <span class="butterfly">🦋</span>
+        </div>
+        <p class="text-gray-600">65岁以上老人健康管理1.4亿人，远程医疗需求激增</p>
+        <div>
+          <span class="source-tag" onclick="window.open('https://www.nhc.gov.cn/guihuaxxs/c100133/202512/f1c3a3c617484a27a1a26a468afbaeee.shtml', '_blank')">来源：国家卫健委</span>
+          <span class="source-tag" onclick="window.open('https://www.toutiao.com/article/7503386329917538857/', '_blank')">来源：艾媒咨询</span>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="card p-5">
+          <h3 class="text-lg font-medium mb-3">核心健康与医疗资源数据</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="text-sm text-gray-500">人均预期寿命（2024）</div>
+              <p class="stat-value text-green-600" data-target="79" data-unit="岁">0岁</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <div class="text-sm text-gray-500">孕产妇死亡率（2024）</div>
+                <p class="text-xl font-bold text-green-600" data-target="14.3" data-unit="人/10万例">0人/10万例</p>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500">婴儿死亡率（2024）</div>
+                <p class="text-xl font-bold text-green-600" data-target="4.0" data-unit="‰">0‰</p>
+              </div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500">老年健康管理（2024）</div>
+              <p class="stat-value text-green-600" data-target="14136" data-unit="万人">0万人</p>
+            </div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <h3 class="text-lg font-medium mb-3">基层医疗资源变化趋势（2020-2024）</h3>
+          <!-- 数据解析移到图表上方 -->
+          <div class="text-xs text-gray-600 mt-2 mb-2">
+            <strong>数据解析：</strong>折线图显示基层医疗资源向人口密集区域集中，村卫生室减少幅度最大。数据来源：<span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo1-0/46711.html?acPlatCode=imw&acFrom=recomBar&iimediaId=105614', '_blank')">艾媒咨询</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="medicalResourceChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <!-- 散点图（分析扩充字数，右侧文字加大字号加边框） -->
+      <div class="card p-5 mt-6">
+        <h3 class="text-lg font-medium mb-3">远程医疗使用率与老年人口增长</h3>
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+          <div class="chart-container">
+            <canvas id="medicalScatterChart"></canvas>
+          </div>
+          <div class="text-base text-gray-700 font-medium border-2 border-green-300 rounded-lg p-3 bg-green-50" style="flex: 1; padding-top: 20px;">
+            <strong>数据解析：</strong>散点图呈老龄化与远程医疗强正相关（r=0.82）：老年占比每增1%，使用率升2.3%。黑龙江老年占比18.7%因严寒使用率达42%；上海覆盖90%小区建15分钟远程圈。西部资源匮乏致使用率高于东部，如凉山5G超声使产检覆盖从60%升至95%。场景以慢病管理占60%为主，协和平台管理50万人控糖达标率提至72%。瓶颈在农村网络与老人数字素养低，卫健委"银龄跨越计划"已培训千万人次。<br><br>
+            数据来源：<span class="source-tag" onclick="window.open('https://report.iimedia.cn/repo1-0/46711.html?acPlatCode=imw&acFrom=recomBar&iimediaId=105614', '_blank')">艾媒咨询</span>、<span class="source-tag" onclick="window.open('https://www.nhc.gov.cn/guihuaxxs/c100133/202512/f1c3a3c617484a27a1a26a468afbaeee.shtml', '_blank')">国家卫健委</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 总结展望（调整两个卡片布局为同一行排列，添加第四点） -->
+    <section id="summary" class="mb-12 scroll-reveal">
+      <div class="text-center">
+        <div class="flex justify-center gap-2">
+          <span class="butterfly">🦋</span>
+          <h2 class="text-2xl font-bold"><span class="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">总结与预测：人口结构重构下的行业变革</span></h2>
+          <span class="butterfly">🦋</span>
+        </div>
+      </div>
+      <div class="card p-6 mt-4 grid md:grid-cols-3 gap-6">
+        <!-- 上面三个卡片保持原布局 -->
+        <div class="bg-amber-50 p-4 rounded">
+          <i class="fa fa-bar-chart text-orange-500 text-2xl"></i>
+          <h3 class="font-bold mt-2">人口数据核心特征</h3>
+          <ul class="list-disc list-inside text-sm mt-2">
+            <li>全国出生率5.63‰，东北最低（黑龙江3.35‰）、西南最高（西藏13.87‰）</li>
+            <li>自然增长率-2.41‰，人口负增长成常态，2025年总人口140489万</li>
+            <li>区域差异显著，人口流动加速资源重构，广东、浙江净流入超500万</li>
+          </ul>
+        </div>
+        <div class="bg-blue-50 p-4 rounded">
+          <i class="fa fa-graduation-cap text-blue-500 text-2xl"></i>
+          <h3 class="font-bold mt-2">教育行业趋势</h3>
+          <ul class="list-disc list-inside text-sm mt-2">
+            <li>乡村教育资源收缩，城市资源优化，城区教师增8.78万、乡村减11.8万</li>
+            <li>教师转岗成为常态，跨学科教学（85分）、心理辅导（78分）成核心能力</li>
+            <li>学前教育规模调整，民办园占比降至53.48%，幼儿园减少5600所</li>
+          </ul>
+        </div>
+        <div class="bg-orange-50 p-4 rounded">
+          <i class="fa fa-smile-o text-orange-500 text-2xl"></i>
+          <h3 class="font-bold mt-2">母婴行业转型</h3>
+          <ul class="list-disc list-inside text-sm mt-2">
+            <li>从增量扩张转向存量竞争，门店从30万减至15万，107.9万企业注销</li>
+            <li>品类结构优化，营养品利润率35%成新支柱，奶粉占比降至32%</li>
+            <li>行业淘汰加速，集中度提升，头部品牌通过"商品+服务"突围</li>
+          </ul>
+        </div>
+        
+        <!-- 下面两个卡片调整为同一行排列（网格布局），添加第四点 -->
+        <div class="grid md:grid-cols-2 gap-6 col-span-3">
+          <!-- 医疗适配卡片（添加第四点） -->
+          <div class="bg-green-50 p-4 rounded">
+            <i class="fa fa-hospital-o text-green-500 text-2xl"></i>
+            <h3 class="font-bold mt-2">医疗资源适配现状与趋势</h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm mt-2">
+              <ul class="list-disc list-inside">
+                <li><strong>基层整合与老年健康</strong>：乡镇卫生院减419个，村卫生室减1.2万，1.4亿老人健康管理率73%，周口合并提升服务40%。</li>
+                <li><strong>费用管控成效显著</strong>：住院费降4.3%至9870元，DRG覆盖92%统筹区，沪家医签约使老年急诊降28%</li>
+              </ul>
+              <ul class="list-disc list-inside">
+                <li><strong>远程医疗高速增长</strong>：与老龄化相关0.82，5G手术试点50城，2030年市场规模破8000亿。</li>
+                <li><strong>医保覆盖与服务质量提升</strong>：城乡居民医保参保率稳95%+，家庭医生签约超5亿人，基层诊疗量占比升至55%。</li>
+              </ul>
+            </div>
+          </div>
+          <!-- 个人看法卡片 -->
+          <div class="bg-orange-50 p-4 rounded">
+            <i class="fa fa-lightbulb-o text-orange-500 text-2xl"></i>
+            <h3 class="font-bold mt-2">个人分析与行业预测</h3>
+            <div class="text-sm space-y-2">
+              <p><strong>核心判断：</strong>2025年人口数据标志从"数量红利"转向"结构红利"，行业需深耕价值，"精准适配"成关键。</p>
+              <p><strong>教育：</strong>乡村小规模校2027年减30%，转岗重质量，引芬兰现象式教学，评价重素养。</p>
+              <p><strong>母婴：</strong>CR10升至30%，头部数据驱动+场景服务，中小聚焦细分，营养品2027年占20%。</p>
+              <p><strong>医疗：</strong>预防优先，2030年健康管理破2万亿，中医+AI+5G缩小城乡差。</p>
+              <p><strong>风险：</strong>生育政策不及预期或致2027年出生率破5‰，经济影响扩至-0.8pct，警惕资源集中空心化。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 趣味互动游戏 -->
+    <section id="games" class="mb-12 scroll-reveal">
+      <div class="text-center">
+        <div class="flex justify-center gap-2">
+          <span class="butterfly">🦋</span>
+          <h2 class="text-2xl font-bold">🎮 趣味互动 · 探索人口奥秘 🎮</h2>
+          <span class="butterfly">🦋</span>
+        </div>
+        <p class="text-gray-600">通过互动游戏，更深入理解人口数据背后的故事</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 mt-6">
+        <div class="card p-5 text-center">
+          <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+            <i class="fa fa-id-card text-3xl text-orange-500"></i>
+          </div>
+          <h3 class="text-xl font-bold mt-2">人口调查员</h3>
+          <p class="text-sm text-gray-600 my-2">根据居民线索选择正确人口数据，集齐省份印章，赢取"人口普查小卫士"徽章！</p>
+          <a href="game1.html" target="_blank" class="bg-orange-500 text-white px-4 py-1 rounded-full hover:bg-orange-600 transition inline-block game-link">开始游戏</a>
+        </div>
+        <div class="card p-5 text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <i class="fa fa-map-marker text-3xl text-green-500"></i>
+          </div>
+          <h3 class="text-xl font-bold mt-2">心栖之城</h3>
+          <p class="text-sm text-gray-600 my-2">24道性格测试题，为你匹配最宜居的灵魂城市，开启你的理想生活！</p>
+          <a href="game2.html" target="_blank" class="bg-orange-500 text-white px-4 py-1 rounded-full hover:bg-orange-600 transition inline-block game-link">开始测试</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 作者信息 -->
+    <section class="mb-12 scroll-reveal">
+      <div class="card p-5 text-center bg-pink-100">
+        <h3 class="text-lg font-medium">大连民族大学 文法学院 新闻学</h3>
+        <p class="text-gray-700 mt-1"><strong>作者：</strong>张嘉芮 冯伟烨 陈昕如 李怡萱 张溪桐</p>
+        <p class="text-gray-700"><strong>指导教师：</strong>吴茜</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-stone-800 text-white py-8">
+    <div class="container mx-auto px-4 text-center">
+      <h3 class="text-xl font-bold mb-3">数据来源标注</h3>
+      <div class="flex flex-wrap justify-center gap-2 text-sm">
+        <a href="https://www.gov.cn/lianbo/202602/content_7059980.htm" target="_blank" class="text-gray-300 hover:text-white">国家统计局2025年统计公报</a>
+        <a href="https://news.qq.com/rain/a/20250710A08RQJ00" target="_blank" class="text-gray-300 hover:text-white">教育部2024年学校数量统计</a>
+        <a href="https://www.iimedia.cn/" target="_blank" class="text-gray-300 hover:text-white">艾媒咨询</a>
+        <a href="https://www.nhc.gov.cn/guihuaxxs/c100133/202512/f1c3a3c617484a27a1a26a468afbaeee.shtml" target="_blank" class="text-gray-300 hover:text-white">国家卫健委2024医疗公报</a>
+        <a href="https://finance.sina.com.cn/wm/2026-04-08/doc-inhttaet6944941.shtml" target="_blank" class="text-gray-300 hover:text-white">中国人口形势报告2026</a>
+      </div>
+      <div class="border-t border-gray-700 mt-6 pt-4 text-gray-400 text-sm">© 2025中国人口普查数据可视化平台 | 基于权威数据整理分析</div>
+    </div>
+  </footer>
+
+  <script>
+    // 页面初始化
+    setTimeout(() => { 
+      const loader = document.getElementById('loadingOverlay'); 
+      if(loader) {
+        loader.style.opacity = '0'; 
+        setTimeout(() => loader?.remove(), 500); 
+      }
+    }, 800);
+    
+    // 导航功能
+    const menuBtn = document.getElementById('menuBtn');
+    const navMenu = document.getElementById('navMenu');
+    if(menuBtn) {
+      menuBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('hidden');
+      });
+    }
+    
+    function scrollToSection(id) { 
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+      if(navMenu) {
+        navMenu.classList.add('hidden'); 
+      }
+    }
+    
+    // 动画功能
+    window.addEventListener('scroll', () => {
+      document.querySelectorAll('.scroll-reveal').forEach(el => { 
+        if(el.getBoundingClientRect().top < window.innerHeight-100) {
+          el.classList.add('active'); 
+        }
+      }); 
+    });
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          const el = entry.target;
+          const target = parseFloat(el.dataset.target);
+          const unit = el.dataset.unit || '';
+          if(isNaN(target)) return;
+          let start = null;
+          const step = (t) => {
+            if(!start) start = t;
+            let p = Math.min((t-start)/800, 1);
+            let cur = target * p;
+            let disp = Number.isInteger(target) ? Math.round(cur) : cur.toFixed(target.toString().split('.')[1]?.length || 1);
+            el.textContent = disp + unit;
+            if(p<1) requestAnimationFrame(step);
+            else el.textContent = target + unit;
+          };
+          requestAnimationFrame(step);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold:0.3 });
+    
+    // 音乐控制功能（修复自动播放）
+    const music = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicToggle');
+    const musicHint = document.getElementById('musicHint');
+    let musicPlaying = false; // 初始未播放
+
+    function setMusicPlaying(playing) {
+      musicPlaying = playing;
+      if (playing) {
+        musicBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
+        musicBtn.setAttribute('title', '关闭音乐');
+        music.play().catch(e => {
+          console.log("播放失败:", e);
+          setMusicPlaying(false);
+          showToast("音乐播放失败，请点击重试", true);
+        });
+      } else {
+        musicBtn.innerHTML = '<i class="fa fa-music"></i>';
+        musicBtn.setAttribute('title', '播放音乐');
+        music.pause();
+      }
+    }
+
+    // 显示音乐提示
+    function showMusicHint() {
+      musicHint.style.display = 'block';
+      setTimeout(() => {
+        musicHint.style.display = 'none';
+      }, 3000);
+    }
+
+    // 自动播放（处理浏览器策略）
+    function tryAutoPlay() {
+      music.play().then(() => {
+        setMusicPlaying(true);
+      }).catch(err => {
+        console.log("自动播放被阻止，需用户点击");
+        setMusicPlaying(false);
+        showMusicHint(); // 显示提示
+        // 点击页面任意位置启动音乐
+        document.body.addEventListener('click', startMusicOnUserInteraction, { once: true });
+      });
+    }
+
+    function startMusicOnUserInteraction() {
+      setMusicPlaying(true);
+      showToast("🎵 背景音乐已启动");
+    }
+
+    // 初始化自动播放
+    tryAutoPlay();
+
+    // 音乐按钮点击事件
+    musicBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setMusicPlaying(!musicPlaying);
+    });
+
+    // 跳转其他页面时关闭音乐
+    function stopMusic() {
+      if (musicPlaying) {
+        music.pause();
+        setMusicPlaying(false);
+      }
+    }
+
+    window.addEventListener('beforeunload', stopMusic);
+    document.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
+          stopMusic();
+        }
+      });
+    });
+
+    // 返回顶部功能
+    document.getElementById('backToTopBtn').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast("⬆️ 已返回页面顶部");
+    });
+    
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toastMessage');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        toast.style.background = isError ? '#F44336' : '#FF9F45';
+        setTimeout(() => {
+          toast.classList.remove('show');
+          toast.style.background = '#FF9F45';
+        }, 2000);
+      }
+    }
+    
+    // 图表功能（调整三个图表尺寸，拉长放大）
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. 教育趋势折线图（拉长放大）
+      new Chart(document.getElementById('educationTrendChart'), {
+        type:'line', 
+        data:{ 
+          labels:['2022','2023','2024'], 
+          datasets:[
+            { label:'学前教育教师数(万人)', data:[324.42,302.81,283.19], borderColor:'#2196F3', fill:true, tension:0.3 }, 
+            { label:'幼儿园关停数(千所)', data:[1.2,2.8,5.6], borderColor:'#F44336', fill:true, tension:0.3 }
+          ] 
+        }, 
+        options:{ 
+          responsive:true, 
+          maintainAspectRatio:false,
+          layout: { padding: 20 }, // 增加内边距
+          scales: { 
+            x: { grid: { display: false } }, 
+            y: { grid: { color: 'rgba(0,0,0,0.05)' } } 
+          } 
+        }
+      });
+      
+      // 2. 母婴行业柱状图（拉长放大）
+      new Chart(document.getElementById('maternalIndustryChart'), {
+        type:'bar', 
+        data:{ 
+          labels:['2020','2021','2022','2023','2024'], 
+          datasets:[
+            { label:'母婴门店数量(万家)', data:[30,27,22,18,15], backgroundColor:'rgba(255,112,67,0.7)' }, 
+            { label:'企业注销数(千家)', data:[2.1,3.5,6.8,107.9,1.3], backgroundColor:'rgba(244,67,54,0.7)' }
+          ] 
+        }, 
+        options:{ 
+          responsive:true, 
+          maintainAspectRatio:false,
+          layout: { padding: 20 }, // 增加内边距
+          scales: { 
+            x: { grid: { display: false } }, 
+            y: { grid: { color: 'rgba(0,0,0,0.05)' } } 
+          } 
+        }
+      });
+      
+      // 3. 医疗资源折线图（拉长放大）
+      new Chart(document.getElementById('medicalResourceChart'), {
+        type:'line', 
+        data:{ 
+          labels:['2020','2021','2022','2023','2024'], 
+          datasets:[
+            { label:'乡镇卫生院(万个)', data:[3.57,3.56,3.55,3.54,3.5358], borderColor:'#4CAF50', fill:true }, 
+            { label:'村卫生室(万个)', data:[60.9,59.9,58.8,57.6,56.4], borderColor:'#388E3C', fill:true }, 
+            { label:'65岁+健康管理(千万人)', data:[12.5,12.8,13.2,13.8,14.1], borderColor:'#2196F3', fill:true }
+          ] 
+        }, 
+        options:{ 
+          responsive:true, 
+          maintainAspectRatio:false,
+          layout: { padding: 20 }, // 增加内边距
+          scales: { 
+            x: { grid: { display: false } }, 
+            y: { grid: { color: 'rgba(0,0,0,0.05)' } } 
+          } 
+        }
+      });
+      
+      // 原有其他图表（保留不变）
+      new Chart(document.getElementById('birthRateRoseChart'), {
+        type: 'polarArea',
+        data: {
+          labels: ['西藏', '贵州', '广东', '广西', '云南', '河南', '山东', '江苏', '吉林', '黑龙江'],
+          datasets: [{
+            data: [13.87, 10.74, 8.89, 8.56, 8.32, 7.23, 6.98, 4.98, 4.17, 3.35],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)',
+              'rgba(199, 199, 199, 0.7)', 'rgba(83, 102, 255, 0.7)', 'rgba(40, 159, 64, 0.7)', 'rgba(210, 99, 132, 0.7)'
+            ]
+          }]
+        },
+        options: { 
+          responsive: true, 
+          plugins: { 
+            legend: { 
+              position: 'left', 
+              labels: { 
+                boxWidth: 12, 
+                padding: 15,
+                generateLabels: (chart) => {
+                  const data = chart.data;
+                  return data.labels.map((label, i) => ({
+                    text: `${label} (${data.datasets[0].data[i]}‰)`,
+                    fillStyle: data.datasets[0].backgroundColor[i],
+                    strokeStyle: data.datasets[0].backgroundColor[i],
+                    index: i
+                  }));
+                }
+              } 
+            } 
+          },
+          scales: { r: { ticks: { display: false } } } 
+        }
+      });
+      
+      new Chart(document.getElementById('teacherSkillRadarChart'), {
+        type: 'radar',
+        data: {
+          labels: ['跨学科教学', '心理辅导', '在线教育', '课程设计', '家校沟通'],
+          datasets: [{
+            label: '能力需求指数',
+            data: [85, 78, 72, 68, 75],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+          }]
+        },
+        options: { 
+          responsive: true, 
+          scales: { r: { beginAtZero: true, max: 100 } } 
+        }
+      });
+      
+      new Chart(document.getElementById('maternalCategoryPieChart'), {
+        type: 'pie',
+        data: {
+          labels: ['奶粉', '营养品', '纸尿裤', '服装', '其他'],
+          datasets: [{
+            data: [32, 15, 18, 20, 15],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)'
+            ]
+          }]
+        },
+        options: { responsive: true }
+      });
+      
+      new Chart(document.getElementById('medicalScatterChart'), {
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: '省份数据',
+            data: [
+              {x: 18.7, y: 42}, {x: 16.2, y: 38}, {x: 15.8, y: 35},
+              {x: 12.3, y: 28}, {x: 19.1, y: 45}, {x: 14.6, y: 32}
+            ],
+            backgroundColor: 'rgba(75, 192, 192, 0.7)'
+          }]
+        },
+        options: { 
+          responsive: true, 
+          scales: { 
+            x: { title: { display: true, text: '65岁+人口占比(%)' } }, 
+            y: { title: { display: true, text: '远程医疗使用率(%)' } } 
+          } 
+        }
+      });
+      
+      // 初始化数字滚动动画
+      document.querySelectorAll('[data-target]').forEach(el => observer.observe(el));
+      window.dispatchEvent(new Event('scroll'));
+    });
+  </script>
+</body>
+</html>

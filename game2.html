@@ -1,0 +1,674 @@
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="zh-CN"><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心栖之城 · 你的未来宜居地</title>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    /* 完全保留原框架样式（未修改） */
+    * { margin:0; padding:0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(145deg, #fae9d9 0%, #f5dcc8 50%, #f2d2bc 100%);
+      font-family: 'Inter', system-ui, sans-serif;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    .test-container {
+      max-width: 800px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(5px);
+      border-radius: 2rem;
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .art-title {
+      font-family: '华文楷体', 'KaiTi', '楷体', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      background: linear-gradient(135deg, #c53b1f, #e67e22, #f1c40f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1.5rem;
+    }
+    .test-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .progress-bar {
+      background: #f0e0d0;
+      border-radius: 40px;
+      height: 8px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: #FF9F45;
+      width: 0%;
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    .question-counter {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #9b6a42;
+      margin-bottom: 1.5rem;
+    }
+    .question-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+    .question-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #5D4037;
+      margin-bottom: 1.2rem;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .option {
+      background: #fef5e8;
+      border-radius: 40px;
+      padding: 0.8rem 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #ffe0b3;
+    }
+    .option:hover {
+      background: #FFBE7D;
+      transform: translateX(5px);
+    }
+    .option.selected {
+      background: #FF9F45;
+      color: white;
+      border-color: #c53b1f;
+    }
+    .option i {
+      width: 24px;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .btn {
+      background: none;
+      border: 1px solid #FF9F45;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      color: #5D4037;
+    }
+    .btn-primary {
+      background: #FF9F45;
+      color: white;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: #e67e22;
+      transform: translateY(-2px);
+    }
+    .result-card {
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .type-label {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #c53b1f;
+      margin: 1rem 0;
+      font-family: '华文楷体', 'KaiTi', serif;
+    }
+    .type-desc {
+      background: #fef5e8;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: left;
+      margin: 1.5rem 0;
+      line-height: 1.8;
+      color: #5D4037;
+      font-size: 1rem;
+    }
+    .city-name {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #4263eb;
+      margin: 1rem 0;
+      font-family: '华文楷体', 'KaiTi', serif;
+    }
+    .city-badge {
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at 30% 30%, #FFD966, #FF9F45);
+      border-radius: 50%;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .city-badge i {
+      font-size: 3rem;
+      color: white;
+      text-shadow: 1px 1px 0 #c53b1f;
+    }
+    .city-desc {
+      background: #fef5e8;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: left;
+      margin: 1.5rem 0;
+      line-height: 1.8;
+      color: #5D4037;
+      font-size: 1rem;
+    }
+    .restart-btn {
+      background: #FF9F45;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 1rem;
+    }
+    .restart-btn:hover {
+      background: #e67e22;
+      transform: translateY(-2px);
+    }
+    .butterfly-deco {
+      position: absolute;
+      font-size: 1.8rem;
+      opacity: 0.3;
+      pointer-events: none;
+      animation: floatButterfly 5s infinite;
+    }
+    @keyframes floatButterfly {
+      0%,100%{transform:translateY(0) rotate(0deg);}
+      50%{transform:translateY(-6px) rotate(5deg);}
+    }
+    .fixed-controls-group {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+      align-items: center;
+    }
+    .control-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 1.5rem;
+      color: #5D4037;
+      text-decoration: none; /* 新增：确保链接无下划线 */
+    }
+    .control-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      background: white;
+    }
+    .control-btn.home-btn { color: #c53b1f; }
+    .control-btn.music-btn { color: #FF9F45; }
+    .control-btn.top-btn { color: #4CAF50; }
+    .control-btn:hover i { animation: pulse 0.5s; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    .btn-label {
+      font-size: 0.7rem;
+      margin-top: 4px;
+      color: #5D4037;
+      font-weight: 500;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 2px 8px;
+      border-radius: 10px;
+      width: 100%;
+    }
+    #musicHint {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 1rem;
+      z-index: 9999;
+      display: block;
+      transition: opacity 0.3s;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #FF9F45;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-weight: bold;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      transition: opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    @media (max-width: 600px) {
+      .test-container { padding: 1rem; }
+      .question-text { font-size: 1rem; }
+      .city-name { font-size: 1.8rem; }
+      .art-title { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="musicHint">点击页面任意位置启动背景音乐</div>
+
+  <div class="test-container relative">
+    <span class="butterfly-deco" style="top: 10px; left: 10px;">🦋</span>
+    <span class="butterfly-deco" style="bottom: 10px; right: 10px; animation-duration: 6s;">🦋</span>
+    <div id="testContent"></div>
+  </div>
+
+  <!-- 固定控制按钮组（仅修改房子锚点部分） -->
+<div class="fixed-controls-group">
+    <div class="control-btn-container">
+      <!-- 小房子图标链接到all.html（主页面）- 参照游戏一修改为纯锚点链接 -->
+      <a href="index.html" class="control-btn home-btn" title="返回主页">
+        <i class="fa fa-home"></i>
+      </a>
+      <div class="btn-label">主页</div>
+    </div>
+    <div class="control-btn-container">
+      <button class="control-btn music-btn" id="musicToggle" title="音乐控制">
+        <i class="fa fa-music"></i>
+      </button>
+      <div class="btn-label">音乐</div>
+    </div>
+    <div class="control-btn-container">
+      <button class="control-btn top-btn" id="backToTopBtn" title="返回顶部">
+        <i class="fa fa-arrow-up"></i>
+      </button>
+      <div class="btn-label">顶部</div>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop preload="auto">
+    <source src="勋章.MP3">
+  </audio>
+  <div id="toastMessage" class="toast"></div>
+
+<script>
+  // ===== 24题（仅修改“海滨/气候舒适、干净整洁、空气好”选项的图标）=====
+  const questions = [
+    // 1. 职业发展（未修改）
+    { text: "你未来最想从事哪类工作？", options: [
+      { text: "AI、程序员、科技研发、工程师", value: "tech", icon: "fa-laptop" },
+      { text: "设计、写作、文创、艺术、自由职业", value: "art", icon: "fa-paint-brush" },
+      { text: "记者、新媒体、传媒、公关、博主", value: "media", icon: "fa-newspaper-o" },
+      { text: "教育、医疗、公职、稳定体制内", value: "stable", icon: "fa-university" }
+    ]},
+    { text: "你工作中最核心的追求是？", options: [
+      { text: "高薪、快速成长、行业前景好", value: "tech", icon: "fa-line-chart" },
+      { text: "自由创作、做热爱的事、不被束缚", value: "art", icon: "fa-heart" },
+      { text: "影响力、表达欲、连接更多人", value: "media", icon: "fa-bullhorn" },
+      { text: "安稳不加班、生活工作平衡", value: "stable", icon: "fa-balance-scale" }
+    ]},
+    { text: "你希望所在城市的产业优势是？", options: [
+      { text: "科技、互联网、人工智能、高新产业", value: "tech", icon: "fa-microchip" },
+      { text: "文创、艺术、设计、生活美学", value: "art", icon: "fa-camera-retro" },
+      { text: "媒体、娱乐、流量、商业活动", value: "media", icon: "fa-film" },
+      { text: "公共服务、国企、教育医疗完善", value: "stable", icon: "fa-hospital-o" }
+    ]},
+    { text: "你对职业晋升的态度是？", options: [
+      { text: "全力冲刺、快速上升、敢拼敢闯", value: "tech", icon: "fa-rocket" },
+      { text: "顺其自然、专注热爱、不刻意内卷", value: "art", icon: "fa-leaf" },
+      { text: "积极拓展人脉、抓住风口机会", value: "media", icon: "fa-handshake-o" },
+      { text: "稳步前进、稳定安全最重要", value: "stable", icon: "fa-shield" }
+    ]},
+    // 2. 生活节奏（未修改）
+    { text: "你更喜欢的城市节奏是？", options: [
+      { text: "快节奏、机会密集、每天都有新变化", value: "tech", icon: "fa-bolt" },
+      { text: "松弛自由、想忙就忙想休息就休息", value: "art", icon: "fa-coffee" },
+      { text: "活力满满、社交丰富、新鲜事多", value: "media", icon: "fa-users" },
+      { text: "慢节奏、悠闲舒适、不用赶时间", value: "stable", icon: "fa-hourglass-half" }
+    ]},
+    { text: "你能接受的生活压力是？", options: [
+      { text: "高压力高回报，愿意为未来奋斗", value: "tech", icon: "fa-trophy" },
+      { text: "压力适中，开心舒服优先", value: "art", icon: "fa-smile-o" },
+      { text: "有压力但充实，拒绝躺平", value: "media", icon: "fa-flag-checkered" },
+      { text: "低压力、不内卷、安稳度日", value: "stable", icon: "fa-home" }
+    ]},
+    { text: "你理想的日常状态是？", options: [
+      { text: "高效充实、不断学习进步", value: "tech", icon: "fa-book" },
+      { text: "自由随性、有时间享受生活", value: "art", icon: "fa-pagelines" },
+      { text: "热闹有趣、经常出门体验", value: "media", icon: "fa-gamepad" },
+      { text: "规律安稳、平淡舒适就好", value: "stable", icon: "fa-calendar-check-o" }
+    ]},
+    { text: "你对加班内卷的看法？", options: [
+      { text: "可以接受，为了发展值得", value: "tech", icon: "fa-thumbs-up" },
+      { text: "非常排斥，生活比工作重要", value: "art", icon: "fa-thumbs-down" },
+      { text: "偶尔可以，长期不行", value: "media", icon: "fa-meh-o" },
+      { text: "坚决拒绝，追求稳定不加班", value: "stable", icon: "fa-ban" }
+    ]},
+    // 3. 社交偏好（未修改）
+    { text: "你更喜欢的城市氛围？", options: [
+      { text: "年轻极客多、技术交流强", value: "tech", icon: "fa-code" },
+      { text: "文艺同好多、安静有品味", value: "art", icon: "fa-music" },
+      { text: "热闹开放、年轻人多、夜生活丰富", value: "media", icon: "fa-glass" },
+      { text: "温和友善、生活气息浓、不喧嚣", value: "stable", icon: "fa-comments-o" }
+    ]},
+    { text: "你的社交模式更像？", options: [
+      { text: "高效社交、重点搞事业", value: "tech", icon: "fa-briefcase" },
+      { text: "小圈子深度相处、不喜热闹", value: "art", icon: "fa-user-circle-o" },
+      { text: "外向爱社交、喜欢认识新朋友", value: "media", icon: "fa-user-plus" },
+      { text: "简单社交、家人朋友陪伴就好", value: "stable", icon: "fa-group" }
+    ]},
+    { text: "你更在意城市的？", options: [
+      { text: "职业机会与发展平台", value: "tech", icon: "fa-suitcase" },
+      { text: "文化氛围与生活美感", value: "art", icon: "fa-paint-brush" },
+      { text: "潮流信息与娱乐生活", value: "media", icon: "fa-info-circle" },
+      { text: "安全舒适与居住环境", value: "stable", icon: "fa-tree" }
+    ]},
+    { text: "你希望城市人际关系？", options: [
+      { text: "简单直接、专注做事", value: "tech", icon: "fa-check-square-o" },
+      { text: "低调自在、互不打扰", value: "art", icon: "fa-eye-slash" },
+      { text: "热情开放、容易交朋友", value: "media", icon: "fa-handshake-o" },
+      { text: "友善亲切、有归属感", value: "stable", icon: "fa-heart" }
+    ]},
+    // 4. 自然环境（仅修改“海滨/气候舒适、干净整洁、空气好”选项的图标）
+    { text: "你最偏爱哪种城市环境？", options: [
+      { text: "现代都市、高楼林立、科技感强", value: "tech", icon: "fa-building" },
+      { text: "山水公园多、绿化好、安静治愈", value: "art", icon: "fa-tree" },
+      { text: "商业繁华、交通便利、吃喝玩乐全", value: "media", icon: "fa-shopping-bag" },
+      // 已修改为水滴图标
+      { text: "海滨/气候舒适、干净整洁、空气好", value: "stable", icon: "fa-tint" }
+    ]},
+    { text: "你对气候的要求是？", options: [
+      { text: "不太在意，机会优先", value: "tech", icon: "fa-cloud" },
+      { text: "温和舒服、四季宜人最佳", value: "art", icon: "fa-thermometer-half" },
+      { text: "只要生活便利，都能接受", value: "media", icon: "fa-wrench" },
+      { text: "非常重要，气候差直接排除", value: "stable", icon: "fa-snowflake-o" }
+    ]},
+    { text: "你更喜欢的城市景观？", options: [
+      { text: "现代科幻、都市天际线", value: "tech", icon: "fa-android" },
+      { text: "绿植茂密、自然生态好", value: "art", icon: "fa-leaf" },
+      { text: "商圈密集、夜景好看", value: "media", icon: "fa-lightbulb-o" },
+      { text: "海滨湖畔、干净清爽", value: "stable", icon: "fa-pagelines" }
+    ]},
+    { text: "居住环境你最看重？", options: [
+      { text: "交通便利、靠近产业区", value: "tech", icon: "fa-subway" },
+      { text: "安静舒适、适合居家创作", value: "art", icon: "fa-bed" },
+      { text: "热闹方便、配套齐全", value: "media", icon: "fa-map-marker" },
+      { text: "环境优美、居住舒适度高", value: "stable", icon: "fa-home" }
+    ]},
+    // 5. 未来发展（未修改）
+    { text: "你选择城市最看重？", options: [
+      { text: "未来潜力、产业前景、高薪机会", value: "tech", icon: "fa-line-chart" },
+      { text: "生活品质、文化氛围、个人喜好", value: "art", icon: "fa-heart" },
+      { text: "知名度、资源集中、机会多元", value: "media", icon: "fa-star" },
+      { text: "安稳宜居、教育医疗、生活成本", value: "stable", icon: "fa-money" }
+    ]},
+    { text: "你对城市未来的期待？", options: [
+      { text: "科技领先、高速发展", value: "tech", icon: "fa-microchip" },
+      { text: "保持特色、舒适宜居", value: "art", icon: "fa-pagelines" },
+      { text: "潮流前沿、活力无限", value: "media", icon: "fa-bolt" },
+      { text: "稳定安全、长期宜居", value: "stable", icon: "fa-shield" }
+    ]},
+    { text: "你更愿意为了什么定居？", options: [
+      { text: "职业天花板、事业成就", value: "tech", icon: "fa-rocket" },
+      { text: "生活幸福感、精神满足", value: "art", icon: "fa-smile-o" },
+      { text: "人生体验、视野格局", value: "media", icon: "fa-globe" },
+      { text: "家庭安稳、健康舒适", value: "stable", icon: "fa-users" }
+    ]},
+    { text: "你对城市房价的态度？", options: [
+      { text: "只要发展好，贵也能接受", value: "tech", icon: "fa-money" },
+      { text: "性价比优先，不想压力太大", value: "art", icon: "fa-exchange" },
+      { text: "适中即可，重点看机会", value: "media", icon: "fa-sliders" },
+      { text: "必须友好，低压力最重要", value: "stable", icon: "fa-home" }
+    ]},
+    // 6. 城市气质（未修改）
+    { text: "你理想的城市气质是？", options: [
+      { text: "创新前卫、科技感、年轻奋斗", value: "tech", icon: "fa-lightbulb-o" },
+      { text: "文艺清新、松弛治愈、有格调", value: "art", icon: "fa-paint-brush" },
+      { text: "开放包容、活力潮流、热闹有趣", value: "media", icon: "fa-users" },
+      { text: "安逸宁静、干净舒服、温和宜居", value: "stable", icon: "fa-leaf" }
+    ]},
+    { text: "你最吸引你的城市标签？", options: [
+      { text: "科创之都、机会之城", value: "tech", icon: "fa-flask" },
+      { text: "文艺之城、治愈之城", value: "art", icon: "fa-book" },
+      { text: "潮流之都、娱乐之城", value: "media", icon: "fa-gamepad" },
+      { text: "宜居之城、安逸之城", value: "stable", icon: "fa-home" }
+    ]},
+    { text: "你希望城市给你的感觉？", options: [
+      { text: "充满机遇、能实现梦想", value: "tech", icon: "fa-rocket" },
+      { text: "放松自在、能做自己", value: "art", icon: "fa-heart" },
+      { text: "精彩丰富、永远不无聊", value: "media", icon: "fa-glass" },
+      { text: "安心踏实、有家的温暖", value: "stable", icon: "fa-users" }
+    ]},
+    { text: "五年后你希望生活在？", options: [
+      { text: "事业有成、高速发展的城市", value: "tech", icon: "fa-line-chart" },
+      { text: "悠闲舒服、有生活质感的城市", value: "art", icon: "fa-coffee" },
+      { text: "活力有趣、年轻潮流的城市", value: "media", icon: "fa-bolt" },
+      { text: "安稳舒适、适合长期生活的城市", value: "stable", icon: "fa-home" }
+    ]}
+  ];
+
+  // ===== 其余代码完全保留（未修改）=====
+  const typeData = {
+    tech: {
+      name: "🔬 科技先锋型 · 未来创造者",
+      desc: "你是理性、上进、目标感极强的进取型人格。热爱科技与创新，追求事业成长与高天花板，愿意为未来适度拼搏，看重成长机会而非安逸。适合产业发达、机会密集、年轻人聚集的高速发展城市。",
+      cities: [
+        { name: "深圳", icon: "fa-building", reason: "深圳是中国科创之都、改革开放标杆城市，拥有全国最密集的互联网、人工智能、硬科技、新能源企业，年轻人占比极高，创业氛围浓厚，机会遍地开花。城市开放包容、不排外、重能力不重背景，节奏快但回报高，非常适合追求高薪、快速成长、敢于拼搏的科技型人才，是实现梦想与事业突破的最佳选择。" },
+        { name: "杭州", icon: "fa-leaf", reason: "杭州被誉为数字经济第一城，互联网、电商、人工智能、云计算行业高度集中，生活环境与工作强度平衡度极佳，城市精致宜居、风景优美，发展空间巨大，适合追求科技事业同时不想过度内卷的人才。" },
+        { name: "上海", icon: "fa-globe", reason: "上海是中国国际化大都市，科技金融与高端产业聚集地，职业发展天花板最高，高端岗位、外企、大厂资源极多，适合有远大目标、追求高端平台与国际视野的科技人才。" },
+        { name: "北京", icon: "fa-university", reason: "北京是全国科技研发中心，互联网大厂、科研院所、高校资源最密集，高端技术岗位全国第一，适合追求技术深度、长期发展、学术与产业结合的人才。" },
+        { name: "合肥", icon: "fa-flask", reason: "合肥是国家科学中心，量子信息、新能源产业黑马，政策红利大、发展速度极快，适合追求未来赛道的科技人才。" }
+      ]
+    },
+    art: {
+      name: "🎨 文艺创作型 · 生活艺术家",
+      desc: "你是感性、细腻、追求美感与自由的生活美学家。讨厌内卷与束缚，重视精神生活、个人热爱与生活质感，喜欢安静、治愈、有文化氛围的环境，适合节奏松弛、环境优美、文化浓厚、自由度高的城市。",
+      cities: [
+        { name: "成都", icon: "fa-coffee", reason: "成都拥有全国顶级的生活松弛感，文创氛围浓厚，美食、美景、茶馆、公园遍布全城，节奏舒适、压力小、包容性强，非常适合自由职业、创作者、设计师、文艺青年长期生活，是国内生活幸福感最高的城市之一。" },
+        { name: "厦门", icon: "fa-umbrella-beach", reason: "厦门是一座精致干净的海滨文艺小城，风景优美、气候舒适、海风宜人，城市安静治愈、节奏缓慢，非常适合写作、摄影、设计、艺术创作等追求自由与美感的人群。" },
+        { name: "苏州", icon: "fa-tree", reason: "苏州是古典与现代完美融合的园林城市，小桥流水、雅致安静，文化底蕴浓厚、生活宜居、环境优美，适合喜欢安静、有格调、追求生活品质的文艺人群。" },
+        { name: "大连", icon: "fa-users", reason: "大连是北方明珠浪漫滨城，星海广场的城市地标、金石滩的海滨度假资源、软件园与造船业的产业基础。适合喜欢滨海但不想离北方太远、追求四季分明的你，夏季平均24℃凉爽宜人，俄式建筑与海鲜文化增添独特魅力，生活成本低于同类沿海城市，是东北亚国际航运中心的核心区。" },
+        { name: "昆明", icon: "fa-users", reason: "昆明四季如春，空气极佳、气候舒适、治愈感拉满，适合追求健康、自然、慢生活的创作者。" }
+      ]
+    },
+    media: {
+      name: "📣 传媒社交型 · 活力连接者",
+      desc: "你是外向、开朗、爱表达、喜欢热闹的社交达人人格。你擅长连接他人、追求影响力与新鲜感，喜欢信息密集、潮流前沿、娱乐丰富、年轻人超多的城市，拒绝无聊与平淡，热爱体验与社交。",
+      cities: [
+        { name: "北京", icon: "fa-newspaper-o", reason: "北京是全国媒体、文化、娱乐、传媒行业绝对中心，资源最集中、机会最多、平台最高，适合想做内容、网红、记者、编导、公关、传媒行业的人群，是实现影响力与职业梦想的最佳城市。" },
+        { name: "长沙", icon: "fa-film", reason: "长沙是中国娱乐传媒之都，综艺、网红、流量、直播行业聚集地，年轻人氛围拉满、快乐指数极高、生活成本低，适合喜欢娱乐、潮流、社交、内容创作的人群。" },
+        { name: "杭州", icon: "fa-shopping-bag", reason: "杭州是电商、直播、内容创作之都，网红经济全国第一，机会多、平台成熟，适合做自媒体、直播、电商内容的人群。" },
+        { name: "成都", icon: "fa-users", reason: "成都是西南娱乐中心，生活热闹、内容产业发达、年轻人多，适合喜欢社交、娱乐、内容创作的人群。" },
+        { name: "重庆", icon: "fa-camera-retro", reason: "重庆是网红城市天花板，流量巨大、娱乐生活丰富、拍摄资源多，适合做短视频、旅游、内容创作的人群。" }
+      ]
+    },
+    stable: {
+      name: "🏡 安稳宜居型 · 生活享受家",
+      desc: "你是温和、踏实、追求舒适与安稳的宜居型人格。你重视生活品质、健康、家庭与幸福感，拒绝内卷与压力，把安心与舒服放在第一位，适合环境优美、气候舒适、节奏缓慢、配套完善、生活成本友好的城市。",
+      cities: [
+        { name: "大连", icon: "fa-users", reason: "大连是东北最美海滨城市，也是全国公认的北方宜居天花板。城市干净整洁、气候舒适、海风清爽、节奏极慢、生活压力小、治安极佳，教育医疗配套完善，房价友好，生活安逸又有品质，非常适合追求安稳、舒适、慢生活、低压力的人群，是长期定居与养老的最佳选择之一。" },
+        { name: "青岛", icon: "fa-users", reason: "青岛是山海之城，风景绝美、气候宜人、生活安逸、教育医疗完善，压力小、幸福感高，适合追求安稳海边生活的人群。" },
+        { name: "昆明", icon: "fa-users", reason: "昆明被誉为春城，四季如春、空气极佳、温度适宜、节奏缓慢，长期居住超级舒服，适合追求健康、舒适、安稳生活的人群。" },
+        { name: "珠海", icon: "fa-users", reason: "珠海是珠三角宜居之王，环境好、空气佳、节奏慢、配套完善，适合追求高品质安稳生活的人群。" },
+        { name: "威海", icon: "fa-users", reason: "威海是全国最干净城市之一，海滨环境绝佳、治愈舒适、生活安逸，适合追求极致干净与舒适的人群。" }
+      ]
+    }
+  };
+
+  // 音乐控制逻辑（未修改）
+  const music = document.getElementById('bgMusic');
+  const musicBtn = document.getElementById('musicToggle');
+  const musicHint = document.getElementById('musicHint');
+  let musicPlaying = false, musicInitialized = false;
+
+  function setMusicPlaying(playing) {
+    musicPlaying = playing;
+    if (playing) {
+      musicBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
+      musicBtn.setAttribute('title', '关闭音乐');
+    } else {
+      musicBtn.innerHTML = '<i class="fa fa-music"></i>';
+      musicBtn.setAttribute('title', '播放音乐');
+    }
+  }
+
+  document.body.addEventListener('click', function initMusic() {
+    musicHint.style.display = 'none';
+    if (!musicInitialized) {
+      music.play()
+        .then(() => {
+          setMusicPlaying(true);
+          musicInitialized = true;
+        })
+        .catch(err => {
+          console.log("音乐播放失败:", err);
+          showToast("音乐播放失败，请点击音乐按钮重试", true);
+        });
+    }
+    document.body.removeEventListener('click', initMusic);
+  });
+
+  musicBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (musicPlaying) {
+      music.pause();
+      setMusicPlaying(false);
+    } else {
+      music.play()
+        .then(() => {
+          setMusicPlaying(true);
+          musicInitialized = true;
+        })
+        .catch(() => showToast("音乐播放失败，请检查文件", true));
+    }
+  });
+
+  // 测试逻辑（未修改）
+  let currentStep = 0, answers = new Array(24).fill(null);
+  const testContent = document.getElementById('testContent');
+  const TOTAL_QUESTIONS = 24;
+
+  function renderQuestion() {
+    const q = questions[currentStep];
+    testContent.innerHTML = `
+      <div class="test-header">
+        <h1 class="art-title">心栖之城 · 宜居测试</h1>
+        <div class="progress-bar"><div class="progress-fill" style="width:${(currentStep/TOTAL_QUESTIONS)*100}%"></div></div>
+        <div class="question-counter">问题 ${currentStep+1}/${TOTAL_QUESTIONS}</div>
+      </div>
+      <div class="question-card">
+        <div class="question-text">${q.text}</div>
+        <div class="options">
+          ${q.options.map((opt, i) => `
+            <div class="option ${answers[currentStep]===i?'selected':''}" onclick="selectOption(${currentStep},${i})">
+              <i class="fa ${opt.icon}"></i> ${opt.text}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn" onclick="prevQuestion()" ${currentStep===0?'disabled':''}>上一题</button>
+        <button class="btn btn-primary" onclick="nextQuestion()" ${answers[currentStep]===null?'disabled':''}>
+          ${currentStep===TOTAL_QUESTIONS-1?'查看结果':'下一题'}
+        </button>
+      </div>
+    `;
+  }
+
+  window.selectOption = (qIdx, oIdx) => { answers[qIdx] = oIdx; renderQuestion(); };
+  window.prevQuestion = () => { if (currentStep>0) currentStep--; renderQuestion(); };
+  window.nextQuestion = () => {
+    if (currentStep < TOTAL_QUESTIONS-1) {
+      currentStep++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  };
+
+  function showResult() {
+    const score = { tech:0, art:0, media:0, stable:0 };
+    answers.forEach((ans, qIdx) => {
+      if (ans !== null) score[questions[qIdx].options[ans].value]++;
+    });
+    let maxType = 'tech';
+    for (const type in score) if (score[type] > score[maxType]) maxType = type;
+    const res = typeData[maxType];
+    const city = res.cities[Math.floor(Math.random() * res.cities.length)];
+    testContent.innerHTML = `
+      <div class="result-card">
+        <h2 class="art-title">你的心栖之城是</h2>
+        <div class="type-label">${res.name}</div>
+        <div class="type-desc">${res.desc}</div>
+        <div class="city-badge"><i class="fa ${city.icon}"></i></div>
+        <div class="city-name">${city.name}</div>
+        <div class="city-desc">${city.reason}</div>
+        <button class="restart-btn" onclick="restartTest()">重新测试</button>
+      </div>
+    `;
+  }
+
+  window.restartTest = () => { currentStep=0; answers.fill(null); renderQuestion(); };
+  function showToast(msg, isError=false) {
+    const toast = document.getElementById('toastMessage');
+    toast.textContent = msg; toast.style.background = isError?'#F44336':'#FF9F45';
+    toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 2000);
+  }
+
+  // 修复加载延迟问题：直接执行渲染，不使用window.onload
+  renderQuestion();
+</script>
+</body>
+</html>
